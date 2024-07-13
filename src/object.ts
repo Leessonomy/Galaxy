@@ -1,11 +1,12 @@
 // @ts-nocheck
 
 import * as THREE from "three";
+import ASSET from "../assets/star2.png";
 
-const texture = new THREE.TextureLoader().load([]);
+const texture = new THREE.TextureLoader().load(ASSET);
 const material = new THREE.SpriteMaterial({
   map: texture,
-  color: "#000000",
+  color: "#FFFFFF",
   transparent: true,
 });
 

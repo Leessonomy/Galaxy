@@ -2,6 +2,11 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 import { GalaxyCurve } from "./galaxy";
+import { Star } from "./object";
+
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
@@ -25,6 +30,20 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.enableZoom = true;
 
+const renderScene = new RenderPass(scene, camera);
+
+const bloom = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  2.6, // strength
+  1.5, // radius
+  0.1 // threshold
+);
+bloom.renderToScreen = true;
+
+const composer = new EffectComposer(renderer);
+composer.addPass(renderScene);
+composer.addPass(bloom);
+
 const ambientLight = new THREE.AmbientLight(0x404040);
 const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 pointLight.position.set(50, 50, 50);
@@ -41,13 +60,9 @@ const points = new GalaxyCurve({
 
 const curve = new THREE.CatmullRomCurve3(points);
 
-const planetGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-const planetMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-
 for (let i = 0; i < points.length; i++) {
-  const planet = new THREE.Mesh(planetGeometry, planetMaterial);
-  planet.position.copy(points[i]);
-  scene.add(planet);
+  const star = new Star(points[i]);
+  star.add(scene);
 }
 
 const pointsPath = curve.getPoints(50);
@@ -84,6 +99,8 @@ function animate() {
   const angle = Math.acos(up.dot(direction));
   camera.quaternion.setFromAxisAngle(axis, angle);
   renderer.render(scene, camera);
+
+  composer.render();
 
   if (time > 0) {
     requestAnimationFrame(animate);
