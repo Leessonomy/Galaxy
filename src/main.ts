@@ -51,31 +51,44 @@ pointLight.position.set(50, 50, 50);
 scene.add(ambientLight);
 scene.add(pointLight);
 
-const points = new GalaxyCurve({
+const curveConfig = {
   radius: 200,
-  numPoints: 200,
+  numPoints: 400,
   turns: 5,
   noiseScale: 5,
-}).create();
+};
+
+const galaxyCurve = new GalaxyCurve(curveConfig);
+
+const points = galaxyCurve.create();
 
 const curve = new THREE.CatmullRomCurve3(points);
 
-for (let i = 0; i < points.length; i++) {
-  const star = new Star(points[i]);
+const numPlanets = Math.floor(curve.getLength() / 5);
+
+for (let i = 0; i < numPlanets; i++) {
+  const index = Math.floor((i * points.length) / numPlanets);
+
+  const star = new Star(points[index]);
+
   star.add(scene);
 }
 
 const pointsPath = curve.getPoints(50);
-const pathGeometry = new THREE.BufferGeometry().setFromPoints(pointsPath);
-const pathMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-const pathLine = new THREE.Line(pathGeometry, pathMaterial);
+const lineGeo = new THREE.BufferGeometry().setFromPoints(pointsPath);
+const lineMaterial = new THREE.LineBasicMaterial({
+  opacity: 0,
+  transparent: true,
+});
+
+const pathLine = new THREE.Line(lineGeo, lineMaterial);
 
 scene.add(pathLine);
 
 console.log(curve, "curve");
 
 const clock = new THREE.Clock();
-const speed = 0.01;
+const speed = 0.001;
 let time = 1;
 
 function animate() {
