@@ -19,7 +19,7 @@ export class GalaxyCurve {
     Object.assign(this, config);
   }
 
-  create() {
+  createObject() {
     const noise = new ImprovedNoise();
 
     const points: THREE.Vector3[] = [];
@@ -33,6 +33,6 @@ export class GalaxyCurve {
       );
       points.push(vec);
     }
-    return points;
+    return new THREE.CatmullRomCurve3(points);
   }
 }
