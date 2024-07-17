@@ -1,10 +1,8 @@
 import * as THREE from "three";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
 import { GalaxyCurve } from "./galaxy";
 import { Star } from "./star";
-import { CurveParams } from "./global.config";
+import { CurveParams, TypeStarColor } from "./global.config";
 
 import { scene, camera, renderer, controls, composer } from "./setup";
 
@@ -15,13 +13,16 @@ let time = 1;
 let speed = 0.001;
 
 function setStarsOnCurve() {
-  const numPlanets = Math.floor(curve.getLength() / 5);
+  const numPlanets = Math.floor(curve.getLength() / 2);
 
   for (let i = 0; i < numPlanets; i++) {
     const points = curve.getPoints(CurveParams.numPoints);
     const index = Math.floor((i * points.length) / numPlanets);
 
-    const star = new Star(points[index]);
+    const star = new Star({
+      position: points[index],
+      color: TypeStarColor[Math.floor(Math.random() * TypeStarColor.length)],
+    });
 
     scene.add(star.createObject());
   }
@@ -37,8 +38,9 @@ function setObjects() {
 
 function setLighting() {
   const ambientLight = new THREE.AmbientLight(0x404040);
-  const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+  const pointLight = new THREE.PointLight(0xffffff, 2, 500);
   pointLight.position.set(50, 50, 50);
+  pointLight.color.setHSL(0.0, 0.0, 0.75);
 
   scene.add(ambientLight);
   scene.add(pointLight);

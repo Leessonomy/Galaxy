@@ -7,6 +7,7 @@ export interface CurveConfig {
   turns: number;
   radius: number;
   noiseScale: number;
+  distanceCoeff: number;
 }
 
 export class GalaxyCurve {
@@ -14,6 +15,7 @@ export class GalaxyCurve {
   readonly turns: number;
   readonly radius: number;
   readonly noiseScale: number;
+  readonly distanceCoeff: number;
 
   constructor(config: CurveConfig) {
     Object.assign(this, config);
