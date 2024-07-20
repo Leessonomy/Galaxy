@@ -4,7 +4,16 @@ import { GalaxyCurve } from "./galaxy";
 import { Star } from "./star";
 import { CurveParams, TypeStarColor } from "./global.config";
 
-import { scene, camera, renderer, controls, composer } from "./setup";
+import {
+  scene,
+  camera,
+  renderer,
+  controls,
+  composer,
+  bloomEffect,
+  renderEffect,
+  shaderEffect,
+} from "./setup";
 
 let curve: THREE.CatmullRomCurve3;
 
@@ -46,6 +55,12 @@ function setLighting() {
   scene.add(pointLight);
 }
 
+function setPostProcessing() {
+  composer.addPass(renderEffect);
+  composer.addPass(bloomEffect);
+  composer.addPass(shaderEffect);
+}
+
 function move() {
   const delta = clock.getDelta();
   time -= speed * delta;
@@ -78,6 +93,7 @@ function animate() {
 function main() {
   setLighting();
   setObjects();
+  setPostProcessing();
   animate();
 }
 
