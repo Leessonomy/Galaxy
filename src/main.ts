@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import { GalaxyCurve } from "./galaxy";
 import { Star } from "./star";
-import { CurveParams, TypeStarColor } from "./global.config";
+import { CurveParams } from "./global.config";
 
 import {
   scene,
@@ -22,6 +22,7 @@ let time = 1;
 let speed = 0.001;
 
 function setStarsOnCurve() {
+  const starsGroup = new THREE.Group();
   const numPlanets = Math.floor(curve.getLength() / 2);
 
   for (let i = 0; i < numPlanets; i++) {
@@ -30,11 +31,13 @@ function setStarsOnCurve() {
 
     const star = new Star({
       position: points[index],
-      color: TypeStarColor[Math.floor(Math.random() * TypeStarColor.length)],
+      color: new THREE.Color(0xffffff),
     });
 
-    scene.add(star.createObject());
+    starsGroup.add(star.createObject());
   }
+
+  scene.add(starsGroup);
 }
 
 function setObjects() {
@@ -71,16 +74,14 @@ function move() {
 
   const point = curve.getPointAt(time);
   const nextPoint = curve.getPointAt(Math.max(time - speed * delta, 0));
-  camera.position.copy(point);
 
+  camera.position.copy(point);
   camera.lookAt(nextPoint);
-  const direction = new THREE.Vector3()
-    .subVectors(point, nextPoint)
-    .normalize();
+
+  const matrix = new THREE.Matrix4();
   const up = new THREE.Vector3(0, 0, 1);
-  const axis = new THREE.Vector3().crossVectors(up, direction).normalize();
-  const angle = Math.acos(up.dot(direction));
-  camera.quaternion.setFromAxisAngle(axis, angle);
+  matrix.lookAt(camera.position, nextPoint, up);
+  camera.rotation.setFromRotationMatrix(matrix);
 }
 
 function animate() {

@@ -6,13 +6,20 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x10d5e0, 0.00005);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
   alpha: true,
 });
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMappingExposure = 0.5;
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-scene.fog = new THREE.FogExp2(0xebe2db, 0.00003);
+document.body.appendChild(renderer.domElement);
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -20,6 +27,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
+camera.position.set(0, 0, 20);
 
 const renderTarget = new THREE.WebGLRenderTarget(
   window.innerWidth,
@@ -31,20 +39,7 @@ const renderTarget = new THREE.WebGLRenderTarget(
   }
 );
 
-camera.position.set(0, 0, 20);
-scene.background = new THREE.Color(0x000000);
-
-document.body.appendChild(renderer.domElement);
-
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMappingExposure = 0.5;
-
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-
 const controls = new OrbitControls(camera, renderer.domElement);
-
 controls.enableZoom = true;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
@@ -56,8 +51,8 @@ const renderEffect = new RenderPass(scene, camera);
 const bloomEffect = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
   1.5,
-  0.4,
-  0.85
+  0.6,
+  0.8
 );
 
 const shader = {
@@ -66,7 +61,7 @@ const shader = {
       value: THREE.Texture,
     },
     bloomTexture: { value: composer.renderTarget2.texture },
-    bloomIntensity: { value: 1.0 },
+    bloomIntensity: { value: 2.0 },
   },
   vertexShader: `
     varying vec2 vUv;

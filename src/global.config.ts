@@ -1,9 +1,9 @@
 export const CurveParams = {
-  radius: 200,
+  radius: 300,
   numPoints: 800,
-  turns: 5,
+  turns: 6,
   noiseScale: 4,
-  distanceCoeff: 0.7,
+  distanceCoeff: 1,
 };
 
-export const TypeStarColor = [0xffffff, 0xadd8e6, 0xffd700, 0xd4deff];
+// export const TypeStarColor = [0xffffff, 0xadd8e6, 0xffd700, 0xd4deff];
