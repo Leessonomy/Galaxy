@@ -51,7 +51,7 @@ function setObjects() {
 function setLighting() {
   const ambientLight = new THREE.AmbientLight(0x404040);
   const pointLight = new THREE.PointLight(0xffffff, 2, 500);
-  pointLight.position.set(50, 50, 50);
+  pointLight.position.set(0, 0, 50);
   pointLight.color.setHSL(0.0, 0.0, 0.75);
 
   scene.add(ambientLight);
@@ -72,16 +72,33 @@ function move() {
     time = 0;
   }
 
-  const point = curve.getPointAt(time);
-  const nextPoint = curve.getPointAt(Math.max(time - speed * delta, 0));
+  const points = curve.getPoints(50);
+  const len = points.length - 1;
+
+  const index = Math.floor(time * len);
+  const nextIndex = Math.min(index + 1, len);
+  const alpha = time * len - index;
+
+  const point0 = points[index];
+  const point1 = points[nextIndex];
+
+  // interpolation
+  const x = point0.x + alpha * (point1.x - point0.x);
+  const y = point0.y + alpha * (point1.y - point0.y);
+  const z = point0.z + alpha * (point1.z - point0.z);
+
+  const point = new THREE.Vector3(x, y, z);
+
+  const nextAlpha = Math.min(time - speed * delta, 0);
+
+  const nextPoint = new THREE.Vector3().lerpVectors(
+    points[index],
+    points[nextIndex],
+    nextAlpha
+  );
 
   camera.position.copy(point);
   camera.lookAt(nextPoint);
-
-  const matrix = new THREE.Matrix4();
-  const up = new THREE.Vector3(0, 0, 1);
-  matrix.lookAt(camera.position, nextPoint, up);
-  camera.rotation.setFromRotationMatrix(matrix);
 }
 
 function animate() {
